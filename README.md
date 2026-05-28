@@ -184,7 +184,7 @@ MIT License - xem file `LICENSE` để biết chi tiết.
 **Phạm Thắng**
 
 - GitHub: [@PhamThang-209-204](https://github.com/PhamThang-209-204)
-- Môn học: Trí Tuệ Nhân Tạo / Đồ Án Chuyên Ngành
+- Môn học: công nghệ xử lý ảnh
 - Trường Đại Học Đại Nam
 
 🙏 **Acknowledgments**
