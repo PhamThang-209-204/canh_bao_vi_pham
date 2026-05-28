@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedShield AI - Hệ thống Giám sát Tốc độ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-shield-halved"></i>
+                <span>SpeedShield AI</span>
+            </div>
+            <div class="system-status">
+                <span class="status-dot"></span>
+                Hệ thống đang hoạt động
+            </div>
+        </header>
+
+        <main>
+            <!-- Left Panel: Control -->
+            <aside class="control-panel">
+                <div class="card glass">
+                    <h3><i class="fas fa-video"></i> Nguồn Video</h3>
+                    
+                    <div class="input-group">
+                        <label for="ip-cam-url">IP Camera / RTSP URL</label>
+                        <input type="text" id="ip-cam-url" placeholder="rtsp://admin:12345@192.168.1.100:554/ch0">
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button id="btn-set-ipcam" class="btn-primary" style="flex: 1;">Kết nối IP Cam</button>
+                            <button id="btn-set-webcam" class="btn-primary" style="flex: 1; background: #10b981;">Dùng Webcam</button>
+                        </div>
+                    </div>
+
+                    <div class="divider"><span>HOẶC</span></div>
+
+                    <div class="input-group">
+                        <label>Tải Video lên</label>
+                        <div class="file-upload" id="drop-zone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Kéo thả hoặc Click để chọn file</p>
+                            <input type="file" id="file-input" accept="video/*" hidden>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card glass stats-card">
+                    <h3><i class="fas fa-chart-line"></i> Thống kê</h3>
+                    <div class="stat-item">
+                        <span>Số xe vi phạm</span>
+                        <span id="stat-violations" class="value">0</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center Panel: Live Feed -->
+            <section class="live-feed">
+                <div class="video-container glass">
+                    <img id="video-stream" src="{{ url_for('video_feed') }}" alt="Live Feed">
+                    <div class="overlay-info">
+                        <span class="live-badge">LIVE</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Violations -->
+            <aside class="violations-panel">
+                <div class="card glass full-height">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Vi phạm mới nhất</h3>
+                    <div class="violations-list" id="violations-list">
+                        <!-- Violations will be injected here -->
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

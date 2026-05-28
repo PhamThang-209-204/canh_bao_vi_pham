@@ -3,10 +3,10 @@ Công cụ hiệu chuẩn camera - Đo tỉ lệ pixel sang mét thực tế
 ============================================================
 Cách sử dụng:
 1. Chạy script với 1 frame từ video bạn muốn xử lý
-2. Click chuột vào 2 điểm có khoảng cách thực tế đã biết
-   (ví dụ: 2 vạch kẻ đường cách nhau 10 mét)
-3. Nhập khoảng cách thực tế vào console
-4. Script sẽ tính ra giá trị METERS_PER_PIXEL để dùng trong Config
+2. Click chuột vào 4 điểm tạo thành HÌNH CHỮ NHẬT trên mặt đường
+   (Thứ tự: Trái-Trên -> Phải-Trên -> Phải-Dưới -> Trái-Dưới)
+3. Nhấn ENTER, sau đó nhập chiều rộng và chiều dài thực tế vào console
+4. Copy các giá trị in ra màn hình vào class Config trong speed_camera.py
 """
 
 import cv2
@@ -22,24 +22,17 @@ original_img = None
 def mouse_callback(event, x, y, flags, param):
     global points, display_img
     if event == cv2.EVENT_LBUTTONDOWN:
-        if len(points) < 2:
+        if len(points) < 4:
             points.append((x, y))
             cv2.circle(display_img, (x, y), 6, (0, 0, 255), -1)
             cv2.putText(display_img, f"P{len(points)}: ({x},{y})",
                         (x + 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
                         0.6, (0, 0, 255), 2)
-            if len(points) == 2:
-                cv2.line(display_img, points[0], points[1], (0, 255, 0), 2)
-                pixel_dist = np.sqrt(
-                    (points[1][0] - points[0][0]) ** 2 +
-                    (points[1][1] - points[0][1]) ** 2
-                )
-                mid = ((points[0][0] + points[1][0]) // 2,
-                       (points[0][1] + points[1][1]) // 2)
-                cv2.putText(display_img, f"{pixel_dist:.1f} pixels",
-                            mid, cv2.FONT_HERSHEY_SIMPLEX,
-                            0.7, (0, 255, 0), 2)
-            cv2.imshow("Calibration - Click 2 points", display_img)
+            if len(points) > 1:
+                cv2.line(display_img, points[-2], points[-1], (0, 255, 0), 2)
+            if len(points) == 4:
+                cv2.line(display_img, points[3], points[0], (0, 255, 0), 2)
+            cv2.imshow("Calibration - Click 4 points", display_img)
 
 
 def main():
@@ -64,15 +57,15 @@ def main():
     original_img = frame.copy()
     display_img = frame.copy()
 
-    print("\n=== HIỆU CHUẨN CAMERA ===")
-    print("1. Click vào 2 điểm có khoảng cách thực tế đã biết")
-    print("   (ví dụ: 2 vạch kẻ đường cách nhau X mét)")
+    print("\n=== HIỆU CHUẨN CAMERA (PERSPECTIVE) ===")
+    print("1. Click vào 4 điểm tạo thành HÌNH CHỮ NHẬT trên mặt đường")
+    print("   (Thứ tự: Trái-Trên -> Phải-Trên -> Phải-Dưới -> Trái-Dưới)")
     print("2. Nhấn 'r' để reset, 'q' để thoát")
-    print("3. Sau khi chọn 2 điểm, nhấn ENTER và nhập khoảng cách thực\n")
+    print("3. Sau khi chọn 4 điểm, nhấn ENTER và nhập kích thước thực\n")
 
-    cv2.namedWindow("Calibration - Click 2 points")
-    cv2.setMouseCallback("Calibration - Click 2 points", mouse_callback)
-    cv2.imshow("Calibration - Click 2 points", display_img)
+    cv2.namedWindow("Calibration - Click 4 points")
+    cv2.setMouseCallback("Calibration - Click 4 points", mouse_callback)
+    cv2.imshow("Calibration - Click 4 points", display_img)
 
     while True:
         key = cv2.waitKey(0) & 0xFF
@@ -81,21 +74,17 @@ def main():
         elif key == ord("r"):
             points.clear()
             display_img = original_img.copy()
-            cv2.imshow("Calibration - Click 2 points", display_img)
-        elif key == 13 and len(points) == 2:  # ENTER
+            cv2.imshow("Calibration - Click 4 points", display_img)
+        elif key == 13 and len(points) == 4:  # ENTER
             cv2.destroyAllWindows()
-            pixel_dist = np.sqrt(
-                (points[1][0] - points[0][0]) ** 2 +
-                (points[1][1] - points[0][1]) ** 2
-            )
             try:
-                real_meters = float(input("Nhập khoảng cách thực tế (mét): "))
-                mpp = real_meters / pixel_dist
+                real_width = float(input("Nhập chiều RỘNG thực tế (mét): "))
+                real_length = float(input("Nhập chiều DÀI thực tế (mét): "))
                 print("\n=== KẾT QUẢ HIỆU CHUẨN ===")
-                print(f"Khoảng cách pixel: {pixel_dist:.2f} px")
-                print(f"Khoảng cách thực: {real_meters} m")
-                print(f"METERS_PER_PIXEL  = {mpp:.6f}")
-                print(f"\n>> Gán giá trị này vào Config.METERS_PER_PIXEL trong speed_camera.py")
+                print(f"SRC_POINTS = {points}")
+                print(f"REAL_WIDTH = {real_width}")
+                print(f"REAL_LENGTH = {real_length}")
+                print("\n>> Copy các giá trị trên vào class Config trong speed_camera.py")
             except ValueError:
                 print("Giá trị không hợp lệ.")
             break

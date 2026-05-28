@@ -1,96 +1,83 @@
-# Hệ Thống Camera Giám Sát Tốc Độ Phương Tiện
+<div align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Logo_DAI_NAM.png/400px-Logo_DAI_NAM.png" alt="Đại học Đại Nam Logo" width="150"/>
+  
+  <h3>TRƯỜNG ĐẠI HỌC ĐẠI NAM</h3>
+  <h4>KHOA CÔNG NGHỆ THÔNG TIN - CHUYÊN NGÀNH AI & IoT</h4>
+  
+  <br>
 
-Hệ thống tự động phát hiện, theo dõi và ước tính tốc độ phương tiện từ video sử dụng **YOLOv8** và **OpenCV**. Khi phát hiện xe vượt quá tốc độ cho phép, hệ thống sẽ tự động chụp ảnh, vẽ thông tin vi phạm và ghi log.
+  # SpeedShield AI - Hệ Thống Giám Sát Tốc Độ Bằng Trí Tuệ Nhân Tạo
+  
+  <p>
+    Dự án nghiên cứu và phát triển hệ thống phát hiện, theo dõi, ước tính tốc độ phương tiện giao thông và lưu trữ bằng chứng vi phạm trên nền tảng Blockchain.
+  </p>
+</div>
 
-## Tính năng chính
+---
 
-- Phát hiện 4 loại phương tiện: xe hơi, xe máy, xe buýt, xe tải (dùng YOLOv8 pretrained trên COCO)
-- Theo dõi đối tượng qua các frame bằng **ByteTrack** (tích hợp sẵn trong Ultralytics)
-- Ước tính tốc độ thực tế (km/h) dựa trên quãng đường pixel giữa các frame
-- Tự động lưu ảnh vi phạm + ghi log CSV (timestamp, ID xe, loại xe, tốc độ)
-- Vẽ trực quan: bounding box, đường di chuyển, tốc độ, trạng thái (xanh/cam/đỏ)
-- Hỗ trợ vùng đo (ROI) để tính tốc độ chính xác hơn ở vị trí mong muốn
-- Công cụ hiệu chuẩn camera đi kèm
+## 📖 Giới thiệu đề tài
 
-## Cấu trúc thư mục
+**SpeedShield AI** là hệ thống tự động phát hiện, theo dõi và ước tính tốc độ phương tiện từ video/webcam/IP Camera sử dụng mạng nơ-ron tích chập **YOLOv8** và xử lý ảnh **OpenCV**. 
 
-```
+Khi phát hiện phương tiện vượt quá tốc độ cho phép, hệ thống sẽ tự động chụp ảnh bằng chứng, ghi nhận các thông tin vi phạm (ID xe, loại xe, tốc độ, thời gian) và băm dữ liệu (hashing) để lưu trữ lên **Blockchain (Smart Contract)** nhằm đảm bảo tính toàn vẹn và minh bạch của dữ liệu.
+
+## ✨ Tính năng nổi bật
+
+- 🚗 **Phát hiện phương tiện:** Hỗ trợ nhận diện 4 loại phương tiện phổ biến: xe hơi, xe máy, xe buýt, xe tải (YOLOv8 pretrained trên tập dữ liệu COCO).
+- 🎯 **Theo dõi đa đối tượng:** Sử dụng thuật toán **ByteTrack** để duy trì định danh (track_id) cho từng xe trong suốt quá trình di chuyển.
+- ⚡ **Ước tính tốc độ (Perspective Transform):** Tính toán tốc độ thực tế (km/h) dựa trên phép biến đổi phối cảnh và khoảng cách pixel qua các frame, đem lại độ chính xác cao.
+- ⛓️ **Tích hợp Blockchain:** Đảm bảo tính bất biến của bằng chứng vi phạm. Mã băm (hash) của hình ảnh và dữ liệu được đẩy lên Smart Contract (Ethereum/Local Network).
+- 🌐 **Web Dashboard:** Giao diện trực quan (Flask) cho phép người dùng giám sát luồng video trực tiếp, tải video lên hoặc dùng Webcam, đồng thời hiển thị danh sách xe vi phạm theo thời gian thực.
+- 📱 **Cảnh báo Telegram:** Tự động gửi ảnh và thông báo vi phạm đến điện thoại qua Telegram Bot.
+
+## 📂 Cấu trúc thư mục
+
+```text
 speed_camera/
-├── speed_camera.py       # File chính - chạy hệ thống
-├── calibrate.py          # Công cụ hiệu chuẩn camera
-├── requirements.txt      # Thư viện cần cài
-├── violations/           # Thư mục lưu ảnh vi phạm (tự tạo)
-└── violations_log.csv    # File log vi phạm (tự tạo)
+├── app.py                # Server Flask chạy giao diện Web Dashboard
+├── speed_camera.py       # Core xử lý AI (YOLO, Tracker, Tính tốc độ)
+├── blockchain_utils.py   # Module tương tác với Smart Contract (Web3)
+├── TrafficViolation.sol  # Smart Contract lưu trữ vi phạm
+├── telegram_bot.py       # Module gửi cảnh báo qua Telegram
+├── calibrate.py          # Script hiệu chuẩn camera (chuyển đổi Pixel -> Mét)
+├── requirements.txt      # Danh sách thư viện cần thiết
+├── templates/            # Giao diện HTML của Web Dashboard
+├── static/               # CSS, JS cho giao diện Web
+└── violations/           # Thư mục lưu ảnh vi phạm tự động
 ```
 
-## Cài đặt
+## 🚀 Hướng dẫn cài đặt & Chạy dự án
 
+### 1. Cài đặt thư viện
 ```bash
 pip install -r requirements.txt
 ```
+*(Lần đầu chạy, hệ thống sẽ tự động tải file model `yolov8n.pt`)*
 
-Lần đầu chạy, YOLO sẽ tự tải file `yolov8n.pt` (~6MB).
-
-## Cách sử dụng
-
-### Bước 1: Hiệu chuẩn camera (QUAN TRỌNG)
-
-Để tốc độ ước tính chính xác, bạn cần biết **1 pixel ứng với bao nhiêu mét** trên thực tế.
-
+### 2. Hiệu chuẩn Camera (Quan trọng)
+Để tính toán tốc độ chính xác, hệ thống cần biết tỉ lệ chuyển đổi từ điểm ảnh (pixel) sang mét thực tế.
 ```bash
 python calibrate.py --video input_video.mp4 --frame 100
 ```
+- Dùng chuột click vào 2 điểm có khoảng cách thực tế đã biết trên video.
+- Nhập khoảng cách thực (mét) vào terminal. Hệ thống sẽ tính ra thông số cấu hình.
 
-- Click chuột vào 2 điểm có khoảng cách thực tế đã biết (ví dụ: 2 vạch kẻ đường cách nhau 10m)
-- Nhấn `Enter` rồi nhập khoảng cách thực
-- Script sẽ in ra giá trị `METERS_PER_PIXEL`
-
-### Bước 2: Cấu hình
-
-Mở `speed_camera.py` và chỉnh class `Config`:
-
-```python
-class Config:
-    VIDEO_SOURCE = "input_video.mp4"   # hoặc 0 để dùng webcam
-    SPEED_LIMIT = 50.0                 # Giới hạn tốc độ (km/h)
-    METERS_PER_PIXEL = 0.05            # Lấy từ bước hiệu chuẩn
-    ROI = (100, 300, 1180, 600)        # Vùng đo (x1,y1,x2,y2), None = toàn frame
-```
-
-### Bước 3: Chạy
-
+### 3. Khởi động hệ thống & Web Dashboard
 ```bash
-python speed_camera.py
+python app.py
 ```
+- Mở trình duyệt web và truy cập vào địa chỉ: **`http://127.0.0.1:5000`**
+- Tại giao diện, bạn có thể:
+  - Xem thống kê trực tiếp.
+  - Chuyển đổi nguồn video (Tải lên file video mp4 hoặc Dùng Webcam).
+  - Xem danh sách và hình ảnh vi phạm được cập nhật realtime.
 
-Nhấn `q` để thoát giữa chừng.
+## 🧠 Nguyên lý hoạt động
 
-## Kết quả
+1. **Phát hiện & Theo dõi (Detection & Tracking):** Mạng YOLOv8 phát hiện các hộp giới hạn (bounding boxes) của phương tiện. ByteTrack gán ID duy nhất cho mỗi xe.
+2. **Biến đổi không gian (Homography):** Dựa trên 4 điểm chuẩn (tạo thành một mặt phẳng hình chữ nhật trên mặt đường), OpenCV tính toán ma trận Perspective Transform.
+3. **Tính toán tốc độ:** Tọa độ pixel của xe được nhân với ma trận để suy ra vị trí thực tế trên mặt đường (theo mét). Từ độ dời quãng đường và thời gian (số frame / FPS), hệ thống tính ra tốc độ `km/h`.
+4. **Xử lý vi phạm:** Nếu tốc độ > Giới hạn, hệ thống crop ảnh, đóng dấu thời gian, mã hóa hash, đẩy hash lên Smart Contract và gửi tin nhắn Telegram.
 
-- `output_annotated.mp4` – Video có vẽ bounding box và tốc độ
-- `violations/violation_<id>_<timestamp>.jpg` – Ảnh vi phạm
-- `violations_log.csv` – Log vi phạm dạng bảng
-
-## Nguyên lý ước tính tốc độ
-
-1. YOLO phát hiện phương tiện ở mỗi frame, ByteTrack gán `track_id` cho từng xe.
-2. Lưu lại tâm bounding box của mỗi xe qua N frame gần nhất (mặc định N=10).
-3. Tính khoảng cách pixel giữa điểm đầu và cuối trong buffer.
-4. Đổi sang mét: `m = pixel × METERS_PER_PIXEL`.
-5. Tính thời gian: `t = (last_frame - first_frame) / FPS`.
-6. Tốc độ: `speed_kmh = (m / t) × 3.6`.
-
-## Lưu ý quan trọng
-
-- **Hiệu chuẩn càng chính xác → tốc độ càng đúng.** Nên đo từ vạch kẻ đường thật.
-- Camera nên đặt cố định, góc nhìn ổn định. Camera lắc sẽ làm sai số tăng cao.
-- Với cảnh có phối cảnh (perspective) mạnh, nên chia ROI thành các vùng nhỏ và hiệu chuẩn riêng cho mỗi vùng – hoặc dùng homography để chuyển sang góc nhìn từ trên xuống (bird's-eye view).
-- Đổi sang `yolov8s.pt` hoặc `yolov8m.pt` cho độ chính xác cao hơn (chậm hơn).
-
-## Hướng phát triển
-
-- Thêm gửi cảnh báo qua email/Telegram/SMS khi có vi phạm
-- OCR biển số xe (dùng EasyOCR hoặc PaddleOCR) để xác định danh tính phương tiện
-- Dùng homography để hiệu chuẩn theo perspective chính xác hơn
-- Tạo dashboard web (Flask/FastAPI) để xem báo cáo vi phạm trực tuyến
-# yolo
+## 👨‍💻 Sinh viên thực hiện
+*Dự án thuộc Khoa Công nghệ thông tin - Chuyên ngành AI & IoT, Trường Đại học Đại Nam.*

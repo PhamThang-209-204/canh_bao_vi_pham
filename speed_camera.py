@@ -18,6 +18,9 @@ from datetime import datetime
 import os
 import csv
 import time
+from telegram_bot import send_telegram_photo
+from blockchain_utils import BlockchainManager, generate_image_hash
+
 
 
 # ===================== CẤU HÌNH =====================
@@ -46,13 +49,23 @@ class Config:
     VEHICLE_CLASSES = [2, 3, 5, 7]
     CLASS_NAMES = {2: "Car", 3: "Motorcycle", 5: "Bus", 7: "Truck"}
 
-    # ---------- Tốc độ ----------
-    SPEED_LIMIT = 50.0
-    METERS_PER_PIXEL = 0.000265         # Lấy từ calibrate.py
+    # ---------- Tốc độ (Perspective Transform) ----------
+    SPEED_LIMIT = 60.0
+    
+    # 4 điểm tạo thành hình chữ nhật trên mặt đường (Lấy từ kết quả chạy calibrate.py)
+    # Thứ tự: Trái-Trên, Phải-Trên, Phải-Dưới, Trái-Dưới
+    SRC_POINTS = [(489, 307), (782, 307), (893, 444), (395, 443)]
+    REAL_WIDTH = 7.0    # Khoảng 2 làn đường (mỗi làn ~3.5m)
+    REAL_LENGTH = 20.0  # Ước tính chiều dài đoạn đường trong ô màu xanh (mét)
+    
     SPEED_BUFFER_SIZE = 10             # Số mẫu để smoothing tốc độ
 
     # Chỉ ghi vi phạm khi xe đã đủ N mẫu trong buffer (đảm bảo tốc độ đã ổn định)
     MIN_SAMPLES_FOR_VIOLATION = 8
+
+    # ---------- Telegram Bot ----------
+    TELEGRAM_BOT_TOKEN = "8384672776:AAHu12MkW_5nFCOntd7gABJdipoNOFUEqW0" # Nhập Token của bot (vd: "123456789:ABCdefGhI")
+    TELEGRAM_CHAT_ID = "5990406025"   # Nhập Chat ID của bạn (vd: "987654321")
 
     # ---------- ROI ----------
     ROI = None  # (x1, y1, x2, y2) hoặc None
@@ -74,14 +87,24 @@ class SpeedTracker:
     - time-based: dùng timestamp thực tế (dành cho webcam / stream)
     """
 
-    def __init__(self, fps, meters_per_pixel, buffer_size=10, time_based=False):
+    def __init__(self, fps, config, time_based=False):
         self.fps = fps
-        self.mpp = meters_per_pixel
-        self.buffer_size = buffer_size
+        self.config = config
+        self.buffer_size = config.SPEED_BUFFER_SIZE
         self.time_based = time_based
 
-        # history[id] = deque[(frame_or_time, cx, cy)]
-        self.history = defaultdict(lambda: deque(maxlen=buffer_size))
+        # Thiết lập ma trận Perspective Transform (Homography)
+        src = np.array(config.SRC_POINTS, dtype=np.float32)
+        dst = np.array([
+            [0, 0],
+            [config.REAL_WIDTH, 0],
+            [config.REAL_WIDTH, config.REAL_LENGTH],
+            [0, config.REAL_LENGTH]
+        ], dtype=np.float32)
+        self.M = cv2.getPerspectiveTransform(src, dst)
+
+        # history[id] = deque[(frame_or_time, meter_x, meter_y)]
+        self.history = defaultdict(lambda: deque(maxlen=self.buffer_size))
         self.speeds = {}
         self.violated_ids = set()
 
@@ -91,18 +114,22 @@ class SpeedTracker:
         - Nếu time_based=True: thời gian thực (giây, từ time.time())
         - Nếu time_based=False: số thứ tự frame (int)
         """
-        self.history[track_id].append((timestamp_or_frame, cx, cy))
+        # Chuyển đổi tọa độ pixel (cx, cy) sang tọa độ mét thực tế
+        point = np.array([[[cx, cy]]], dtype=np.float32)
+        transformed_point = cv2.perspectiveTransform(point, self.M)
+        meter_x, meter_y = transformed_point[0][0]
+
+        self.history[track_id].append((timestamp_or_frame, meter_x, meter_y, cx, cy))
 
         if len(self.history[track_id]) < 2:
             self.speeds[track_id] = 0.0
             return 0.0
 
-        first_t, fx, fy = self.history[track_id][0]
-        last_t, lx, ly = self.history[track_id][-1]
+        first_t, fx, fy, _, _ = self.history[track_id][0]
+        last_t, lx, ly, _, _ = self.history[track_id][-1]
 
-        # Quãng đường thực tế (mét)
-        pixel_distance = np.sqrt((lx - fx) ** 2 + (ly - fy) ** 2)
-        meters = pixel_distance * self.mpp
+        # Quãng đường thực tế (mét) đã được tính trên hệ tọa độ mét
+        meters = np.sqrt((lx - fx) ** 2 + (ly - fy) ** 2)
 
         # Thời gian (giây)
         if self.time_based:
@@ -121,18 +148,19 @@ class SpeedTracker:
     def num_samples(self, track_id):
         return len(self.history[track_id])
 
-    def is_in_roi(self, cx, cy, roi):
-        if roi is None:
+    def is_in_polygon(self, cx, cy, polygon):
+        if not polygon:
             return True
-        x1, y1, x2, y2 = roi
-        return x1 <= cx <= x2 and y1 <= cy <= y2
+        pts = np.array(polygon, np.int32).reshape((-1, 1, 2))
+        return cv2.pointPolygonTest(pts, (cx, cy), False) >= 0
 
 
 # ===================== LỚP GHI NHẬN VI PHẠM =====================
 class ViolationLogger:
-    def __init__(self, output_dir, log_file):
+    def __init__(self, output_dir, log_file, blockchain_manager=None):
         self.output_dir = output_dir
         self.log_file = log_file
+        self.blockchain_manager = blockchain_manager
         os.makedirs(output_dir, exist_ok=True)
 
         if not os.path.exists(log_file):
@@ -140,10 +168,11 @@ class ViolationLogger:
                 writer = csv.writer(f)
                 writer.writerow([
                     "Timestamp", "Track_ID", "Vehicle_Type",
-                    "Speed_kmh", "Speed_Limit", "Image_Path"
+                    "Speed_kmh", "Speed_Limit", "Image_Path", "TxHash"
                 ])
 
-    def log_violation(self, frame, bbox, track_id, vehicle_type, speed, speed_limit):
+    def log_violation(self, frame, bbox, track_id, vehicle_type, speed, config):
+        speed_limit = config.SPEED_LIMIT
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
         filename = f"violation_{track_id}_{timestamp}.jpg"
         filepath = os.path.join(self.output_dir, filename)
@@ -164,15 +193,38 @@ class ViolationLogger:
 
         cv2.imwrite(filepath, annotated)
 
+        # ===== XỬ LÝ BLOCKCHAIN =====
+        tx_hash = "N/A"
+        if self.blockchain_manager:
+            image_hash = generate_image_hash(filepath)
+            violation_id = f"{timestamp}_{track_id}"
+            tx = self.blockchain_manager.add_violation(
+                violation_id=violation_id,
+                vehicle_id=track_id,
+                speed=f"{speed:.2f}",
+                timestamp=time_str,
+                image_hash=image_hash
+            )
+            if tx:
+                tx_hash = tx
+        # ============================
+
         with open(self.log_file, "a", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow([
                 time_str, track_id, vehicle_type,
-                f"{speed:.2f}", f"{speed_limit:.0f}", filepath
+                f"{speed:.2f}", f"{speed_limit:.0f}", filepath, tx_hash
             ])
 
         print(f"[CẢNH BÁO] Xe ID={track_id} ({vehicle_type}) "
               f"vi phạm tốc độ: {speed:.1f} km/h. Đã lưu: {filepath}")
+              
+        # Gửi Telegram
+        caption = f"🚨 CẢNH BÁO VI PHẠM TỐC ĐỘ 🚨\n" \
+                  f"- Thời gian: {time_str}\n" \
+                  f"- Loại xe: {vehicle_type}\n" \
+                  f"- Tốc độ: {speed:.1f} km/h (Giới hạn: {speed_limit} km/h)"
+        send_telegram_photo(filepath, caption)
 
 
 # ===================== HÀM HỖ TRỢ =====================
@@ -214,10 +266,13 @@ def run_speed_camera(config: Config):
     print(f"✓ YOLO input size: {config.YOLO_IMGSZ}")
 
     tracker = SpeedTracker(
-        fps, config.METERS_PER_PIXEL,
-        config.SPEED_BUFFER_SIZE, time_based=live
+        fps, config, time_based=live
     )
-    logger = ViolationLogger(config.VIOLATIONS_DIR, config.VIOLATIONS_LOG)
+    
+    blockchain_manager = BlockchainManager()
+    blockchain_manager.load_contract()
+    
+    logger = ViolationLogger(config.VIOLATIONS_DIR, config.VIOLATIONS_LOG, blockchain_manager=blockchain_manager)
 
     writer = None
     if config.SAVE_OUTPUT_VIDEO:
@@ -263,11 +318,7 @@ def run_speed_camera(config: Config):
 
         annotated = frame.copy()
 
-        if config.ROI:
-            x1, y1, x2, y2 = config.ROI
-            cv2.rectangle(annotated, (x1, y1), (x2, y2), (255, 255, 0), 2)
-            cv2.putText(annotated, "ROI - Vung do toc do", (x1, y1 - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+        # Không hiện ô vùng nhận diện lên video nữa theo yêu cầu
 
         if results[0].boxes is not None and results[0].boxes.id is not None:
             boxes = results[0].boxes.xyxy.cpu().numpy()
@@ -278,7 +329,7 @@ def run_speed_camera(config: Config):
                 x1, y1, x2, y2 = map(int, box)
                 cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
 
-                if not tracker.is_in_roi(cx, cy, config.ROI):
+                if not tracker.is_in_polygon(cx, cy, config.SRC_POINTS):
                     continue
 
                 vehicle_type = config.CLASS_NAMES.get(int(cls_id), "Unknown")
@@ -302,8 +353,8 @@ def run_speed_camera(config: Config):
                 cv2.circle(annotated, (cx, cy), 4, color, -1)
                 history = tracker.history[int(track_id)]
                 for i in range(1, len(history)):
-                    pt1 = (history[i - 1][1], history[i - 1][2])
-                    pt2 = (history[i][1], history[i][2])
+                    pt1 = (history[i - 1][3], history[i - 1][4])
+                    pt2 = (history[i][3], history[i][4])
                     cv2.line(annotated, pt1, pt2, color, 2)
 
                 # Ghi vi phạm khi đủ điều kiện
@@ -313,7 +364,7 @@ def run_speed_camera(config: Config):
                     tracker.violated_ids.add(int(track_id))
                     logger.log_violation(
                         frame, box, int(track_id),
-                        vehicle_type, speed, config.SPEED_LIMIT
+                        vehicle_type, speed, config
                     )
 
         # Banner thông tin
@@ -364,6 +415,93 @@ def run_speed_camera(config: Config):
     print(f"Ảnh vi phạm: {config.VIOLATIONS_DIR}/")
     if config.SAVE_OUTPUT_VIDEO:
         print(f"Video kết quả: {config.OUTPUT_VIDEO}")
+
+
+def generate_frames(video_source, config: Config):
+    """Generator function để stream video cho Flask."""
+    print(f"Đang khởi tạo luồng xử lý cho: {video_source}")
+    model = YOLO(config.MODEL_PATH)
+    cap = cv2.VideoCapture(video_source)
+    
+    if not cap.isOpened():
+        print(f"✗ Không mở được nguồn video: {video_source}")
+        return
+
+    fps = cap.get(cv2.CAP_PROP_FPS) or 30
+    live = is_live_source(video_source)
+    
+    tracker = SpeedTracker(fps, config, time_based=live)
+    blockchain_manager = BlockchainManager()
+    blockchain_manager.load_contract()
+    logger = ViolationLogger(config.VIOLATIONS_DIR, config.VIOLATIONS_LOG, blockchain_manager=blockchain_manager)
+
+    frame_idx = 0
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        frame_idx += 1
+        if frame_idx % config.PROCESS_EVERY_N_FRAMES != 0:
+            continue
+
+        time_or_frame = time.time() if live else frame_idx
+
+        # YOLO + ByteTrack
+        results = model.track(
+            frame,
+            persist=True,
+            classes=config.VEHICLE_CLASSES,
+            tracker="bytetrack.yaml",
+            imgsz=config.YOLO_IMGSZ,
+            verbose=False
+        )
+
+        annotated = frame.copy()
+
+        if results[0].boxes is not None and results[0].boxes.id is not None:
+            boxes = results[0].boxes.xyxy.cpu().numpy()
+            track_ids = results[0].boxes.id.int().cpu().numpy()
+            class_ids = results[0].boxes.cls.int().cpu().numpy()
+
+            for box, track_id, cls_id in zip(boxes, track_ids, class_ids):
+                x1, y1, x2, y2 = map(int, box)
+                cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
+
+                if not tracker.is_in_polygon(cx, cy, config.SRC_POINTS):
+                    continue
+
+                vehicle_type = config.CLASS_NAMES.get(int(cls_id), "Unknown")
+                speed = tracker.update(int(track_id), cx, cy, time_or_frame)
+
+                # Màu theo trạng thái
+                if speed > config.SPEED_LIMIT:
+                    color = (0, 0, 255)
+                elif speed > config.SPEED_LIMIT * 0.8:
+                    color = (0, 165, 255)
+                else:
+                    color = (0, 255, 0)
+
+                cv2.rectangle(annotated, (x1, y1), (x2, y2), color, 2)
+                label = f"ID:{track_id} {vehicle_type} {speed:.1f}km/h"
+                (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+                cv2.rectangle(annotated, (x1, y1 - th - 8), (x1 + tw + 4, y1), color, -1)
+                cv2.putText(annotated, label, (x1 + 2, y1 - 4),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+                if (speed > config.SPEED_LIMIT
+                        and int(track_id) not in tracker.violated_ids
+                        and tracker.num_samples(int(track_id)) >= config.MIN_SAMPLES_FOR_VIOLATION):
+                    tracker.violated_ids.add(int(track_id))
+                    logger.log_violation(frame, box, int(track_id), vehicle_type, speed, config)
+
+        # Encode frame as JPEG
+        ret, buffer = cv2.imencode('.jpg', annotated)
+        frame_bytes = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+    cap.release()
 
 
 if __name__ == "__main__":
