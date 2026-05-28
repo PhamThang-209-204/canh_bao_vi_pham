@@ -1,6 +1,6 @@
 <div align="center">
 
-# SpeedShield AI
+# GIÁM SÁT TỐC ĐỘ VÀ CẢNH BÁO VI PHẠM
 
 Hệ Thống Giám Sát Tốc Độ Phương Tiện Tự Động Bằng Trí Tuệ Nhân Tạo
 
@@ -29,7 +29,7 @@ Sử dụng Computer Vision để phát hiện, theo dõi, ước tính tốc đ
 - [License](#-license)
 
 ## 🎯 Giới Thiệu
-**SpeedShield AI** là giải pháp công nghệ thông minh hỗ trợ giám sát giao thông tự động. Bằng cách kết hợp sức mạnh của **YOLOv8** và **OpenCV**, hệ thống có khả năng phân tích luồng video thời gian thực để đo lường tốc độ xe cộ. 
+**GIÁM SÁT TỐC ĐỘ VÀ CẢNH BÁO VI PHẠM** là giải pháp công nghệ thông minh hỗ trợ giám sát giao thông tự động. Bằng cách kết hợp sức mạnh của **YOLOv8** và **OpenCV**, hệ thống có khả năng phân tích luồng video thời gian thực để đo lường tốc độ xe cộ. 
 
 Không chỉ dừng lại ở AI, hệ thống còn tiên phong tích hợp **Blockchain** để lưu vết bằng chứng vi phạm một cách minh bạch, chống gian lận dữ liệu, đồng thời cung cấp Web Dashboard tiện lợi và cảnh báo trực tiếp qua **Telegram**.
 
