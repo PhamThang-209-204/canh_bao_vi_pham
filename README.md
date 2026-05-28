@@ -1,13 +1,18 @@
+````md
 <div align="center">
 
-# GIÁM SÁT TỐC ĐỘ VÀ CẢNH BÁO VI PHẠM
+# 🚦 GIÁM SÁT TỐC ĐỘ VÀ CẢNH BÁO VI PHẠM
 
-Hệ Thống Giám Sát Tốc Độ Phương Tiện Tự Động Bằng Trí Tuệ Nhân Tạo
+### Hệ Thống Giám Sát Tốc Độ Phương Tiện Tự Động Bằng Trí Tuệ Nhân Tạo
 
-<img src="[logoDaiNam.png" alt="DaiNam University Logo](https://ttsinhvien.dainam.edu.vn/FileManager/Upload/images/logoTruongDHThuDo.png)" width="150"/>
+<img src="https://ttsinhvien.dainam.edu.vn/FileManager/Upload/images/logoTruongDHThuDo.png" alt="DaiNam University Logo" width="150"/>
+
+<br>
 
 **TRƯỜNG ĐẠI HỌC ĐẠI NAM**  
 **Khoa Công nghệ thông tin - Chuyên ngành AI & IoT**
+
+<br>
 
 Sử dụng Computer Vision để phát hiện, theo dõi, ước tính tốc độ phương tiện giao thông và lưu trữ bằng chứng vi phạm trên nền tảng Blockchain.
 
@@ -15,183 +20,322 @@ Sử dụng Computer Vision để phát hiện, theo dõi, ước tính tốc đ
 
 </div>
 
-## 📋 Mục Lục
+---
 
-- [Giới Thiệu](#-giới-thiệu)
-- [Tính Năng](#-tính-năng)
-- [Công Nghệ](#️-công-nghệ)
-- [Kiến Trúc Hệ Thống](#️-kiến-trúc-hệ-thống)
-- [Cài Đặt](#-cài-đặt)
-- [Sử Dụng](#-sử-dụng)
-- [Tài Liệu Cốt Lõi](#-tài-liệu-cốt-lõi)
-- [Screenshots](#-screenshots)
-- [Đóng Góp](#️-đóng-góp)
-- [License](#-license)
+# 📋 Mục Lục
 
-## 🎯 Giới Thiệu
-**GIÁM SÁT TỐC ĐỘ VÀ CẢNH BÁO VI PHẠM** là giải pháp công nghệ thông minh hỗ trợ giám sát giao thông tự động. Bằng cách kết hợp sức mạnh của **YOLOv8** và **OpenCV**, hệ thống có khả năng phân tích luồng video thời gian thực để đo lường tốc độ xe cộ. 
+- [🎯 Giới Thiệu](#-giới-thiệu)
+- [✨ Tính Năng](#-tính-năng)
+- [🛠️ Công Nghệ](#️-công-nghệ)
+- [🏗️ Kiến Trúc Hệ Thống](#️-kiến-trúc-hệ-thống)
+- [📦 Cài Đặt](#-cài-đặt)
+- [🚀 Sử Dụng](#-sử-dụng)
+- [📖 Tài Liệu Cốt Lõi](#-tài-liệu-cốt-lõi)
+- [📸 Screenshots](#-screenshots)
+- [🤝 Đóng Góp](#️-đóng-góp)
+- [📄 License](#-license)
 
-Không chỉ dừng lại ở AI, hệ thống còn tiên phong tích hợp **Blockchain** để lưu vết bằng chứng vi phạm một cách minh bạch, chống gian lận dữ liệu, đồng thời cung cấp Web Dashboard tiện lợi và cảnh báo trực tiếp qua **Telegram**.
+---
 
-🌟 **Điểm Đặc Biệt**
+# 🎯 Giới Thiệu
 
-- ✅ **Chính Xác Cao** - Ước tính tốc độ qua thuật toán Homography (Perspective Transform) và tracking chính xác bằng ByteTrack.
-- ✅ **Toàn Vẹn Dữ Liệu** - Mọi hình ảnh vi phạm đều được băm (hashing) và lưu trữ hash lên Smart Contract.
-- ✅ **Thông Báo Tức Thì** - Cảnh báo qua Telegram ngay khi có xe vượt quá tốc độ giới hạn (kèm ảnh bằng chứng).
-- ✅ **Linh Hoạt Nguồn Video** - Hỗ trợ Webcam, IP Camera, hoặc tải lên File Video bất kỳ.
+## GIÁM SÁT TỐC ĐỘ VÀ CẢNH BÁO VI PHẠM
 
-## ✨ Tính Năng
-🚗 **1. Nhận Diện & Theo Dõi Thông Minh**
+Là giải pháp công nghệ thông minh hỗ trợ giám sát giao thông tự động bằng Trí Tuệ Nhân Tạo.
 
-- Nhận diện 4 loại phương tiện: Xe hơi, Xe máy, Xe buýt, Xe tải (YOLOv8).
-- Duy trì ID liên tục cho từng phương tiện trên các khung hình (ByteTrack).
+Hệ thống sử dụng:
 
-⚡ **2. Đo Tốc Độ Tự Động**
+- 🤖 YOLOv8 để nhận diện phương tiện
+- 🎥 OpenCV để xử lý video
+- 🚗 ByteTrack để theo dõi phương tiện
+- ⚡ Perspective Transform để tính tốc độ
+- ⛓️ Blockchain để lưu trữ dữ liệu vi phạm
+- 📲 Telegram Bot để cảnh báo tức thì
 
-- Tính toán tốc độ km/h dựa trên khoảng cách di chuyển thực tế (đã được hiệu chuẩn).
-- Phân biệt rõ ràng trạng thái: Bình thường (Xanh), Chú ý (Cam), Vi phạm (Đỏ).
+Hệ thống có khả năng:
 
-🌐 **3. Web Dashboard Trực Quan**
+- Phát hiện xe vi phạm tốc độ theo thời gian thực
+- Tính toán vận tốc phương tiện chính xác
+- Chụp ảnh bằng chứng
+- Gửi cảnh báo Telegram
+- Lưu dữ liệu minh bạch lên Blockchain
 
-- Giao diện giám sát trực tiếp trên trình duyệt.
-- Tự động thống kê và hiển thị danh sách các xe vi phạm mới nhất (Realtime).
-- Thay đổi nguồn phát (Webcam, File, IP Camera) chỉ bằng 1 cú click.
+---
 
-⛓️ **4. Lưu Trữ Blockchain & Telegram**
+# 🌟 Điểm Nổi Bật
 
-- Sinh mã Hash cho ảnh vi phạm.
-- Ghi dữ liệu (ID Xe, Tốc độ, Hash ảnh, Thời gian) vào mạng lưới Blockchain.
-- Gửi ảnh và thông báo tức thì đến điện thoại người quản lý qua Telegram.
+✅ **Độ Chính Xác Cao**  
+Ước tính tốc độ bằng Homography và ByteTrack Tracking.
 
-## 🛠️ Công Nghệ
-### Tech Stack
+✅ **Realtime Detection**  
+Xử lý video thời gian thực với Webcam hoặc IP Camera.
+
+✅ **Blockchain Security**  
+Hash ảnh vi phạm được lưu trên Smart Contract.
+
+✅ **Telegram Alert**  
+Thông báo ngay khi phát hiện xe vượt tốc độ.
+
+✅ **Hỗ Trợ Nhiều Nguồn Video**  
+Webcam, Video MP4, IP Camera.
+
+---
+
+# ✨ Tính Năng
+
+## 🚗 1. Nhận Diện & Theo Dõi Phương Tiện
+
+- Nhận diện:
+  - Xe máy
+  - Ô tô
+  - Xe tải
+  - Xe buýt
+
+- Theo dõi ID từng phương tiện bằng ByteTrack.
+
+---
+
+## ⚡ 2. Đo Tốc Độ Tự Động
+
+- Tính tốc độ theo km/h
+- Hiển thị trạng thái:
+  - 🟢 Bình thường
+  - 🟠 Cảnh báo
+  - 🔴 Vi phạm
+
+---
+
+## 🌐 3. Web Dashboard
+
+- Hiển thị video realtime
+- Danh sách xe vi phạm
+- Upload video trực tiếp
+- Hỗ trợ Webcam/IP Camera
+
+---
+
+## ⛓️ 4. Blockchain & Telegram
+
+- Sinh mã Hash SHA256
+- Lưu dữ liệu lên Blockchain
+- Gửi cảnh báo Telegram
+- Lưu ảnh vi phạm tự động
+
+---
+
+# 🛠️ Công Nghệ
+
 | Công Nghệ | Phiên Bản | Mục Đích |
 |-----------|-----------|----------|
-| [Python](https://python.org) | 3.10+ | Ngôn ngữ phát triển chính |
-| [YOLOv8](https://github.com/ultralytics/ultralytics) | Latest | Model AI phát hiện vật thể |
-| [OpenCV](https://opencv.org/) | 4.8.x | Xử lý ảnh, Perspective Transform |
-| [Flask](https://flask.palletsprojects.com/) | 3.x | Web Backend Framework |
-| [Web3.py](https://web3py.readthedocs.io/) | 6.x | Giao tiếp với Smart Contract (Blockchain) |
-| [Solidity](https://soliditylang.org/) | ^0.8.0 | Viết Smart Contract |
+| Python | 3.10+ | Ngôn ngữ chính |
+| YOLOv8 | Latest | Object Detection |
+| OpenCV | 4.8+ | Xử lý ảnh/video |
+| Flask | 3.x | Web Framework |
+| Web3.py | 6.x | Blockchain |
+| Solidity | ^0.8.0 | Smart Contract |
 
-## 🏗️ Kiến Trúc Hệ Thống
+---
+
+# 🏗️ Kiến Trúc Hệ Thống
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│                       NGUỒN VIDEO                           │
-│  ┌──────────┐       ┌──────────┐       ┌──────────┐         │
-│  │  Webcam  │   OR  │IP Camera │   OR  │ File MP4 │         │
-│  └────┬─────┘       └────┬─────┘       └────┬─────┘         │
-└───────┼──────────────────┼──────────────────┼───────────────┘
-        │                  │                  │
-┌───────▼──────────────────▼──────────────────▼───────────────┐
-│                    AI CORE (speed_camera.py)                │
-│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐ │
-│  │ YOLOv8 Object  │  │ ByteTrack      │  │ Perspective    │ │
-│  │ Detection      ├──► ID Tracking    ├──► Transformation │ │
-│  └────────────────┘  └────────────────┘  └───────┬────────┘ │
-└──────────────────────────────────────────────────┼──────────┘
-                                                   │
-┌──────────────────────────▼───────────────────────▼──────────┐
-│                    XỬ LÝ VI PHẠM                            │
-│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐ │
-│  │ Ghi log CSV    │  │ Gửi Telegram   │  │ Đẩy lên        │ │
-│  │ Lưu ảnh Local  │  │ Bot Alert      │  │ Blockchain     │ │
-│  └────┬───────────┘  └────────────────┘  └────────────────┘ │
-└───────┼─────────────────────────────────────────────────────┘
-        │
-┌───────▼─────────────────────────────────────────────────────┐
-│                    WEB DASHBOARD (app.py)                   │
-│  ┌────────────────┐  ┌────────────────┐                     │
-│  │ Video LiveFeed │  │ Cập nhật bảng  │                     │
-│  │ (Flask Route)  │  │ vi phạm (API)  │                     │
-│  └────────────────┘  └────────────────┘                     │
-└─────────────────────────────────────────────────────────────┘
-```
+┌───────────────────────────────────────────────┐
+│                 VIDEO INPUT                   │
+│ Webcam │ IP Camera │ Video File               │
+└──────────────────────┬────────────────────────┘
+                       │
+┌──────────────────────▼────────────────────────┐
+│                AI PROCESSING                  │
+│ YOLOv8 → ByteTrack → Speed Estimate           │
+└──────────────────────┬────────────────────────┘
+                       │
+┌──────────────────────▼────────────────────────┐
+│              VIOLATION PROCESSING             │
+│ Save Image │ Telegram │ Blockchain            │
+└──────────────────────┬────────────────────────┘
+                       │
+┌──────────────────────▼────────────────────────┐
+│                WEB DASHBOARD                  │
+│ Live Stream │ Statistics │ Violation Table    │
+└───────────────────────────────────────────────┘
+````
 
-## 📦 Cài Đặt
-### Yêu Cầu Hệ Thống
-- Python 3.10 trở lên
-- Mạng Blockchain Local (như Ganache) nếu muốn test Smart Contract
-- Telegram Bot Token
+---
 
-### Bước 1: Clone Repository
+# 📦 Cài Đặt
+
+## ⚙️ Yêu Cầu Hệ Thống
+
+* Python 3.10+
+* Webcam hoặc IP Camera
+* Telegram Bot Token
+* Ganache (nếu dùng Blockchain)
+
+---
+
+## 🔽 Clone Repository
+
 ```bash
 git clone https://github.com/PhamThang-209-204/canh_bao_vi_pham.git
 cd canh_bao_vi_pham
 ```
 
-### Bước 2: Tạo Virtual Environment
+---
+
+## 🐍 Tạo Virtual Environment
+
+### Windows
+
 ```bash
-# Windows
 python -m venv .venv
 .\.venv\Scripts\activate
+```
 
-# Linux/Mac
+### Linux/Mac
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### Bước 3: Cài Đặt Dependencies
+---
+
+## 📥 Cài Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### Bước 4: Cấu hình Telegram & Blockchain (Tùy chọn)
-- Mở file `telegram_bot.py` và điền `TOKEN`, `CHAT_ID` của bạn.
-- Đảm bảo Smart Contract `TrafficViolation.sol` đã được deploy nếu sử dụng tính năng Blockchain.
+---
 
-## 🚀 Sử Dụng
+## ⚙️ Cấu Hình Telegram
 
-### 1. Hiệu Chuẩn Camera (Calibrate)
-Để tính tốc độ chính xác, hệ thống cần biết tỉ lệ Pixel -> Mét thực tế.
+Tạo file `.env`
+
+```env
+TELEGRAM_TOKEN=your_token
+CHAT_ID=your_chat_id
+```
+
+---
+
+# 🚀 Sử Dụng
+
+## 🎯 Hiệu Chuẩn Camera
+
 ```bash
 python calibrate.py --video input_video.mp4 --frame 100
 ```
-- Dùng chuột click vào 2 điểm có khoảng cách thực tế đã biết trên video.
-- Nhập khoảng cách thực (mét) vào terminal. Hệ thống sẽ in ra thông số để bạn cấu hình.
 
-### 2. Chạy Web Dashboard
+### Các bước:
+
+1. Click 2 điểm trên video
+2. Nhập khoảng cách thực tế
+3. Hệ thống tính tỉ lệ Pixel → Mét
+
+---
+
+## ▶️ Chạy Hệ Thống
+
 ```bash
 python app.py
 ```
-- Mở trình duyệt truy cập: `http://127.0.0.1:5000`
-- Tải lên video MP4 hoặc nhấp nút **Dùng Webcam** để bắt đầu giám sát.
 
-## 📖 Tài Liệu Cốt Lõi
-### Nguyên Lý Tính Tốc Độ (Perspective Transform)
-Hệ thống không tính tốc độ mù quáng theo 2D pixel vì vật càng xa trông càng nhỏ (chuyển động chậm hơn). Thay vào đó:
-1. Dùng ma trận **Homography** chiếu không gian 2D (màn hình) thành không gian phẳng (nhìn từ trên xuống) với đơn vị tính là **Mét**.
-2. Tính khoảng cách giữa tâm xe ở frame A và frame B trên không gian phẳng này.
-3. Chia cho thời gian chênh lệch (Delta T) để ra vận tốc (m/s) -> quy đổi ra km/h.
+Mở trình duyệt:
 
-## 📸 Screenshots
-*(Bạn có thể thêm hình ảnh giao diện Web hoặc tin nhắn Telegram vào đây)*
+```text
+http://127.0.0.1:5000
+```
 
-## 🤝 Đóng Góp
+---
+
+# 📖 Nguyên Lý Tính Tốc Độ
+
+Hệ thống sử dụng:
+
+* Perspective Transform
+* Homography Matrix
+* Object Tracking
+
+Quy trình:
+
+1. Chuyển đổi không gian 2D → Bird Eye View
+2. Tính khoảng cách thực tế
+3. Tính vận tốc:
+
+```text
+Speed = Distance / Time
+```
+
+4. Quy đổi sang km/h
+
+---
+
+# 📸 Screenshots
+
+## 🌐 Web Dashboard
+
+* Live Camera
+* Vehicle Tracking
+* Speed Detection
+* Violation Table
+
+## 📲 Telegram Alert
+
+* Ảnh xe vi phạm
+* Tốc độ
+* Thời gian
+* Vehicle ID
+
+---
+
+# 🤝 Đóng Góp
+
 Contributions, issues và feature requests đều được chào đón!
 
-1. Fork repository.
-2. Tạo branch (`git checkout -b feature/AmazingFeature`).
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to branch (`git push origin feature/AmazingFeature`).
-5. Mở Pull Request.
+## Các bước đóng góp:
 
-## 📄 License
-MIT License - xem file `LICENSE` để biết chi tiết.
+```bash
+1. Fork repository
+2. Create branch
+3. Commit changes
+4. Push branch
+5. Open Pull Request
+```
 
-## 👨‍💻 Tác Giả
-**Phạm Thắng**
+---
 
-- GitHub: [@PhamThang-209-204](https://github.com/PhamThang-209-204)
-- Môn học: công nghệ xử lý ảnh
-- Trường Đại Học Đại Nam
+# 📄 License
 
-🙏 **Acknowledgments**
-- [Ultralytics](https://github.com/ultralytics/ultralytics) - YOLOv8 Object Detection.
-- Khoa Công nghệ thông tin, Trường Đại học Đại Nam.
-- Nguồn cảm hứng từ các hệ thống Giao thông thông minh (ITS).
+MIT License
 
-⭐ **Nếu project này hữu ích, hãy cho một star nhé!** ⭐
+---
+
+# 👨‍💻 Tác Giả
+
+## Phạm Thắng
+
+* GitHub: https://github.com/PhamThang-209-204
+* Trường Đại Học Đại Nam
+* Chuyên ngành AI & IoT
+
+---
+
+# 🙏 Acknowledgments
+
+* Ultralytics YOLOv8
+* OpenCV
+* Flask
+* Web3.py
+* Trường Đại Học Đại Nam
+
+---
+
+<div align="center">
+
+## ⭐ Nếu project hữu ích hãy cho repository một Star ⭐
 
 Made with ❤️ by Phạm Thắng
+
+</div>
+```
