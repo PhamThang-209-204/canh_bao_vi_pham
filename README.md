@@ -80,4 +80,4 @@ python app.py
 4. **Xử lý vi phạm:** Nếu tốc độ > Giới hạn, hệ thống crop ảnh, đóng dấu thời gian, mã hóa hash, đẩy hash lên Smart Contract và gửi tin nhắn Telegram.
 
 ## 👨‍💻 Sinh viên thực hiện
-*Dự án thuộc Khoa Công nghệ thông tin - Chuyên ngành AI & IoT, Trường Đại học Đại Nam.*
+*Dự án thuộc Khoa Công nghệ thông tin - Trường Đại học Đại Nam.*
