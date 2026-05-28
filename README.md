@@ -1,6 +1,6 @@
 <div align="center">
 
-# SpeedShield AI
+# GIÁM SÁT TỐC ĐỘ VÀ CẢNH BÁO VI PHẠM
 
 Hệ Thống Giám Sát Tốc Độ Phương Tiện Tự Động Bằng Trí Tuệ Nhân Tạo
 
