@@ -2,8 +2,8 @@ import requests
 import threading
 
 # 🔑 Cấu hình tại đây
-TOKEN = "8384672776:AAHu12MkW_5nFCOntd7gABJdipoNOFUEqW0"   # ← token ví dụ
-CHAT_ID = "5990406025"                       # ← chat_id của bạn
+TOKEN = ""   # ← token 
+CHAT_ID = ""                       # ← chat_id của bạn
 
 def send_telegram_photo_sync(photo_path, caption=""):
     """
