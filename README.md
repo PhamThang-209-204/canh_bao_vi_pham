@@ -25,7 +25,7 @@ Sử dụng Computer Vision để phát hiện, theo dõi, ước tính tốc đ
 - [Cài Đặt](#-cài-đặt)
 - [Sử Dụng](#-sử-dụng)
 - [Tài Liệu Cốt Lõi](#-tài-liệu-cốt-lõi)
-- [Screenshots](#-screenshots)
+- [Hệ thống Cảnh Báo Vi Phạm Giao Thông](#-Hệ thống Cảnh Báo Vi Phạm Giao Thông)
 - [Đóng Góp](#️-đóng-góp)
 - [License](#-license)
 
