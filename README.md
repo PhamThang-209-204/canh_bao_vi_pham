@@ -12,7 +12,7 @@ Hệ Thống Giám Sát Tốc Độ Phương Tiện Tự Động Bằng Trí Tu�
 Sử dụng Computer Vision để phát hiện, theo dõi, ước tính tốc độ phương tiện giao thông và lưu trữ bằng chứng vi phạm trên nền tảng Blockchain.
 # Hệ thống Cảnh Báo Vi Phạm Giao Thông
 
-![Poster dự án](thang2.pdf)
+![Poster dự án](poster.jpg)
 
 🚀 Demo • ✨ Tính Năng • 📦 Cài Đặt • 📖 Tài Liệu • 🤝 Đóng Góp
 
