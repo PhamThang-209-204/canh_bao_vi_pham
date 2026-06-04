@@ -4,7 +4,7 @@
 
 Hệ Thống Giám Sát Tốc Độ Phương Tiện Tự Động Bằng Trí Tuệ Nhân Tạo
 
-<img src="Logo_DAI_NAM.png" alt="Đại học Đại Nam Logo" width="150"/>
+<img src="Logo_DAI_NAM.png""LogoAIoTLab.png" alt="Đại học Đại Nam Logo" width="150"/>
 
 **TRƯỜNG ĐẠI HỌC ĐẠI NAM**  
 **Khoa Công nghệ thông tin - Chuyên ngành AI & IoT**
