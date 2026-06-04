@@ -4,13 +4,23 @@
 
 Hệ Thống Giám Sát Tốc Độ Phương Tiện Tự Động Bằng Trí Tuệ Nhân Tạo
 
-<img src="Logo_DAI_NAM.png""LogoAIoTLab.png" alt="Đại học Đại Nam Logo" width="150"/>
+<table>
+<tr>
+<td align="center" width="45%">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Logo_DAI_NAM.png/400px-Logo_DAI_NAM.png" alt="Đại học Đại Nam Logo" width="150"/>
+</td>
+<td align="center" width="10%">
+</td>
+<td align="center" width="45%">
+<img src="LogoAIoTLab.png" alt="AIoT Lab Logo" width="150"/>
+</td>
+</tr>
+</table>
 
 **TRƯỜNG ĐẠI HỌC ĐẠI NAM**  
 **Khoa Công nghệ thông tin - Chuyên ngành AI & IoT**
 
 Sử dụng Computer Vision để phát hiện, theo dõi, ước tính tốc độ phương tiện giao thông và lưu trữ bằng chứng vi phạm trên nền tảng Blockchain.
-
 
 🚀 Demo • ✨ Tính Năng • 📦 Cài Đặt • 📖 Tài Liệu • 🤝 Đóng Góp
 
@@ -25,7 +35,7 @@ Sử dụng Computer Vision để phát hiện, theo dõi, ước tính tốc đ
 - [Cài Đặt](#-cài-đặt)
 - [Sử Dụng](#-sử-dụng)
 - [Tài Liệu Cốt Lõi](#-tài-liệu-cốt-lõi)
-- [Hệ thống Cảnh Báo Vi Phạm Giao Thông](#-Hệ-thống-Cảnh-Báo-Vi-Phạm-Giao-Thông)
+- [Hệ Thống Cảnh Báo Vi Phạm Giao Thông](#-hệ-thống-cảnh-báo-vi-phạm-giao-thông)
 - [Đóng Góp](#️-đóng-góp)
 - [License](#-license)
 
@@ -166,9 +176,8 @@ Hệ thống không tính tốc độ mù quáng theo 2D pixel vì vật càng x
 2. Tính khoảng cách giữa tâm xe ở frame A và frame B trên không gian phẳng này.
 3. Chia cho thời gian chênh lệch (Delta T) để ra vận tốc (m/s) -> quy đổi ra km/h.
 
-# Hệ thống Cảnh Báo Vi Phạm Giao Thông
-
-![Poster dự án](poster.jpg)
+## 📸 Screenshots
+*(Bạn có thể thêm hình ảnh giao diện Web hoặc tin nhắn Telegram vào đây)*
 
 ## 🤝 Đóng Góp
 Contributions, issues và feature requests đều được chào đón!
